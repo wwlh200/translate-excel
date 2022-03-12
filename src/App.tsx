@@ -2,9 +2,9 @@ import "./App.css";
 import * as XLSX from "xlsx";
 
 function App() {
-  const handleImportExcel = (file) => {
+  const handleImportExcel = (e) => {
     // 获取上传的文件对象
-    const { files } = file.target;
+    const file = e?.target?.files?.[0];
     // 通过FileReader对象读取文件
     const fileReader = new FileReader();
     fileReader.onload = (event) => {
@@ -23,7 +23,7 @@ function App() {
             // break; // 如果只取第一张表，就取消注释这行
           }
         }
-        console.log(data);
+        translateJsonData(data);
       } catch (e) {
         // 这里可以抛出文件类型错误不正确的相关提示
         console.log("文件类型不正确");
@@ -31,8 +31,33 @@ function App() {
       }
     };
     // 以二进制方式打开文件
-    fileReader.readAsBinaryString(files[0]);
+    fileReader.readAsBinaryString(file);
   };
+
+  const translateJsonData = (jsonData) => {
+    const translateData = [];
+    for (let [index, item] of jsonData.entries()) {
+      const content = [];
+      for (let [key, value] of Object.entries(item)) {
+        content.push({ text_title: key, text_content: value });
+      }
+      translateData.push({ id: index, content: JSON.stringify(content) });
+    }
+    console.log(translateData);
+    exportExcel(translateData);
+  };
+
+  const exportExcel = (srcData) => {
+    // 创建workbook对象
+    const wb = XLSX.utils.book_new();
+    // 将srcData转换为worksheet
+    const ws = XLSX.utils.json_to_sheet(srcData);
+    // worksheet 加入workbook
+    XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+    // 导出
+    XLSX.writeFile(wb, "translate.xlsx");
+  };
+
   return (
     <div className="App">
       <input type="file" accept=".xlsx, .xls" onChange={handleImportExcel} />
