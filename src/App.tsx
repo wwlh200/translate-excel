@@ -60,7 +60,18 @@ function App() {
 
   return (
     <div className="App">
-      <input type="file" accept=".xlsx, .xls" onChange={handleImportExcel} />
+      <div>
+        <h1>excel转换</h1>
+        <h4>请选择xlsx文件，选中后会自动转换为id，content(含text_title,text_content的对象数组)的xlsx文件并自动下载</h4>
+        <a className="file">
+          选择文件
+          <input
+            type="file"
+            accept=".xlsx, .xls"
+            onChange={handleImportExcel}
+          />
+        </a>
+      </div>
     </div>
   );
 }
